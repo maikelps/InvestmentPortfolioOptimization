@@ -8,4 +8,4 @@ stocks_symbols = [ df.symbol.loc[i] for i in range(len(df))]
 
 stock_prices = [round(df.closingprice.loc[i],2) for i in range(len(df))]
 
-budget = 1000
+budget = 10000
