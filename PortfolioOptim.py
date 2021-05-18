@@ -46,32 +46,42 @@ def evaluate(self, days_in_the_future = 15):
         # Price position
         index_symbol = stocks_symbols.index(stock_symbol)
 
-        # Price of stock
-        price = stock_prices[index_symbol]
+        # Value of stock NOW
+        value0 = stock_prices[index_symbol]
 
-        if pred < 0:
-            price = price * -1
+        # Value of stock THEN
+        value1 = value0 + pred
+
+        #if pred < 0:
+            #price = price * -1
         
-        return round(price,2)
+        return value0, value1
     
     # Copy of the selected stocks:
     portfolio = self.representation
-    portfolio_performance = 0
+    portfolio_value_now = 0
+    portfolio_value_then = 0
 
     for i in portfolio:
-        # Get the position of the stock
-        index = portfolio.index(i)
 
         # Select stock symbol
-        current_stock_symbol = stocks_symbols[index]
+        current_stock_symbol = stocks_symbols[i]
+        #print(current_stock_symbol)
 
         # Add the performance of each stock
-        portfolio_performance += stock_performance(current_stock_symbol)
+        valuenow, valuethen = stock_performance(current_stock_symbol)
+        portfolio_value_now += valuenow
+        portfolio_value_then += valuethen
 
-        if portfolio_performance > budget:
-            portfolio_performance = -1 * portfolio_performance
+    # Limiting for the budget, 
+    if portfolio_value_now > budget:
+        # but only when the predicted value of the portfolio is worse than 0 to better evolve
+        if portfolio_value_then > 0:
+            portfolio_value_then = -1 * portfolio_value_then
+        
+        #print(portfolio_performance)
     
-    return round(portfolio_performance,2)
+    return round(portfolio_value_then,2)
 
 
 def get_neighbours(self):
@@ -91,23 +101,39 @@ def get_neighbours(self):
 Individual.evaluate = evaluate
 Individual.get_neighbours = get_neighbours
 
+# Variable for population size:
+popsize = 10
 
 pop = Population(
-    size=2, 
+    size= popsize, 
     optim="max", 
     sol_size=5, 
     valid_set=[i for i in stocks_index],
     replacement=False
 )
 
+for i in range(popsize):
+    print(pop[i].representation,pop[i])
+
 pop.evolve(
-    gens = 100, 
+    gens = 10, 
     select = fps,
     crossover = single_point_co,
-    mutate = inversion_mutation,
+    mutate = swap_mutation,
     co_p=0.7,
     mu_p=0.2,
-    elitism=True
+    elitism=False
 )
 
-print(pop)
+"""
+# Slow evolving, no bugs.
+pop.evolve(
+    gens = 10, 
+    select = fps,
+    crossover = single_point_co,
+    mutate = inversion_mutation, #swap_mutation
+    co_p=0.7,
+    mu_p=0.2,
+    elitism=False
+)
+"""
