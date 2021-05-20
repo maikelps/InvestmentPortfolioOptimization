@@ -14,9 +14,6 @@ str_endate = endate.strftime('%d/%m/%Y')
 # Getting the stocks info:
 stocks_info = investpy.stocks.get_stocks(country = selected_country)
 
-# Filtering stocks with error:
-#conditions = (~stocks_info.symbol.isin(['CAKFF', 'PDLI']))
-#stocks_info = stocks_info[ conditions ].reset_index(drop=True)
 
 for i in range(len(stocks_info)):
     try:
@@ -45,24 +42,3 @@ for i in range(len(stocks_info)):
 
     except:
         pass
-
-#stocknames = [ [stocks_info.name.loc[i], stocks_info.symbol.loc[i]] for i in range(len(stocks_info))]
-"""
-prices = []
-i = 0
-
-for _ , stocksym in stocknames:
-    try:
-        dfprices = investpy.get_stock_historical_data(stock = stocksym,
-                                            country = selected_country,
-                                            from_date = date0,
-                                            to_date = endate)
-    except:
-        pass
-    
-    print(i, _, stocksym)
-    i += 1
-    prices.append(dfprices.Close.loc[endate])
-
-print(prices)
-"""
